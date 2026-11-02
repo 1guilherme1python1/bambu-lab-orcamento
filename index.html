@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Precificação 3D — Bambu Lab A1 Mini</title>
+  <style>
+    /* Reset & CSS Custom Properties */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-main: #090d16;
+      --bg-card: #131b2e;
+      --bg-card-subtle: #1a253d;
+      --bg-input: #0b1120;
+      --border-color: #24314d;
+      --border-focus: #00ae42;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-bambu: #00ae42;
+      --accent-bambu-hover: #02c74d;
+      --accent-bambu-glow: rgba(0, 174, 66, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-color);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem 1rem 3rem;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #00ae42 0%, #06b6d4 100%);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px var(--accent-bambu-glow);
+    }
+
+    .brand-logo svg {
+      width: 26px;
+      height: 26px;
+      fill: #ffffff;
+    }
+
+    .brand-info h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-bambu {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(0, 174, 66, 0.15);
+      color: #00ea59;
+      border: 1px solid rgba(0, 174, 66, 0.35);
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.55rem 0.95rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      color: var(--text-main);
+      background: var(--bg-card-subtle);
+    }
+
+    .btn:hover {
+      background: #253352;
+      border-color: var(--border-color);
+    }
+
+    .btn-primary {
+      background: var(--accent-bambu);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 0 16px var(--accent-bambu-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-bambu-hover);
+      box-shadow: 0 0 20px rgba(0, 174, 66, 0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border-color);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-card-subtle);
+      border-color: #3f527c;
+    }
+
+    .btn-sm {
+      padding: 0.38rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-danger-ghost {
+      color: #fda4af;
+      background: transparent;
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+
+    .btn-danger-ghost:hover {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: var(--accent-rose);
+      color: #fff;
+    }
+
+    /* Grid Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.95fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 1.5rem;
+    }
+
+    .card:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1.15rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent-bambu);
+    }
+
+    .card-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-input);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Form Inputs */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem 1rem;
+    }
+
+    @media (max-width: 580px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-group.col-span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 580px) {
+      .form-group.col-span-2 {
+        grid-column: span 1;
+      }
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .label-hint {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-bambu-glow);
+    }
+
+    .input-affix {
+      padding: 0 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      height: 100%;
+    }
+
+    .input-affix-prefix {
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .input-affix-suffix {
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0.65rem 0.8rem;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    input::placeholder {
+      color: #475569;
+    }
+
+    /* Dual input for time */
+    .time-dual-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    /* Collapsible Section */
+    details.accordion-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.2s ease;
+    }
+
+    details.accordion-card[open] {
+      border-color: #3b4e75;
+    }
+
+    details.accordion-card summary {
+      padding: 1.15rem 1.35rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+      user-select: none;
+      background: var(--bg-card);
+      transition: background 0.2s ease;
+    }
+
+    details.accordion-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.accordion-card summary:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .summary-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .summary-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 174, 66, 0.12);
+      color: var(--accent-bambu);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .summary-text h3 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .summary-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .summary-chevron {
+      color: var(--text-dim);
+      transition: transform 0.25s ease;
+    }
+
+    details.accordion-card[open] .summary-chevron {
+      transform: rotate(180deg);
+      color: var(--accent-bambu);
+    }
+
+    .accordion-body {
+      padding: 0 1.35rem 1.35rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--bg-card);
+    }
+
+    /* Sub-callout box inside machine settings */
+    .sub-callout {
+      margin-top: 1.15rem;
+      padding: 0.85rem 1rem;
+      background: rgba(11, 17, 32, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 580px) {
+      .sub-callout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .callout-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .callout-metric span:first-child {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .callout-metric span:last-child {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    /* Pricing Section Controls */
+    .tabs-pricing {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      background: var(--bg-input);
+      padding: 0.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.15rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      padding: 0.55rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-bambu);
+      color: #ffffff;
+      box-shadow: 0 2px 8px var(--accent-bambu-glow);
+    }
+
+    /* Method difference comparison banner */
+    .method-explanation {
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      font-size: 0.78rem;
+      color: #bae6fd;
+      margin-bottom: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      line-height: 1.45;
+    }
+
+    .method-explanation-header {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 600;
+      color: var(--accent-cyan);
+    }
+
+    .method-explanation-header svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .comparison-micro-table {
+      margin-top: 0.25rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      background: rgba(11, 17, 32, 0.6);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      font-size: 0.74rem;
+    }
+
+    @media (max-width: 480px) {
+      .comparison-micro-table {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Checkbox toggle */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      cursor: pointer;
+      user-select: none;
+      padding: 0.5rem 0;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-container input[type="checkbox"]:checked {
+      background: var(--accent-bambu);
+      border-color: var(--accent-bambu);
+    }
+
+    .checkbox-container input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .checkbox-label {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Validation Alert */
+    .alert-banner {
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fecdd3;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .alert-banner.show {
+      display: flex;
+    }
+
+    /* Right Column / Results Panel */
+    .results-panel {
+      position: sticky;
+      top: 1.25rem;
+    }
+
+    /* Highlight KPIs */
+    .kpi-main-card {
+      background: linear-gradient(145deg, #131d33 0%, #162444 100%);
+      border: 1px solid rgba(0, 174, 66, 0.4);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 174, 66, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-main-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00ae42, #06b6d4, #00ae42);
+    }
+
+    .suggested-price-box {
+      text-align: center;
+      padding: 0.75rem 0 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 1.15rem;
+    }
+
+    .suggested-price-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .suggested-price-val {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .suggested-price-val .currency {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--accent-bambu);
+      margin-right: 0.2rem;
+    }
+
+    .rounding-diff-tag {
+      display: inline-block;
+      margin-top: 0.45rem;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+
+    .kpi-item {
+      background: rgba(11, 17, 32, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.85rem;
+    }
+
+    .kpi-item-title {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .kpi-item-val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .kpi-item-val.profit {
+      color: #4ade80;
+    }
+
+    .kpi-item-val.margin {
+      color: #38bdf8;
+    }
+
+    .kpi-item-val.cost {
+      color: #fb923c;
+    }
+
+    .kpi-item-val.hourly {
+      color: #cbd5e1;
+    }
+
+    /* Cost Distribution Chart Section */
+    .chart-section {
+      margin: 1.25rem 0;
+      padding: 1.15rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+
+    .chart-header {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chart-body-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .chart-body-wrapper {
+        flex-direction: column;
+      }
+    }
+
+    .donut-container {
+      width: 130px;
+      height: 130px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-container svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .donut-center-text {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-center-text span {
+      display: block;
+      line-height: 1.1;
+    }
+
+    .donut-center-label {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .donut-center-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    /* Progress Distribution Bar */
+    .cost-progress-bar {
+      height: 12px;
+      border-radius: 999px;
+      display: flex;
+      overflow: hidden;
+      background: var(--bg-input);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 0.85rem;
+      width: 100%;
+    }
+
+    .cost-segment {
+      height: 100%;
+      transition: width 0.3s ease;
+      position: relative;
+    }
+
+    .cost-segment[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #090d16;
+      color: #fff;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+      border: 1px solid var(--border-color);
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Chart Legend / Pill chips */
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.75rem;
+      flex: 1;
+    }
+
+    .legend-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Breakdown Table */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    table.cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.82rem;
+    }
+
+    table.cost-table th {
+      background: var(--bg-card-subtle);
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.cost-table td {
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+
+    table.cost-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.cost-table tr.row-total {
+      background: rgba(0, 174, 66, 0.08);
+      font-weight: 700;
+    }
+
+    table.cost-table tr.row-total td {
+      color: #ffffff;
+      border-top: 1px solid rgba(0, 174, 66, 0.3);
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-muted {
+      color: var(--text-muted);
+    }
+
+    /* Action Buttons in Results */
+    .action-panel-buttons {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-top: 1.15rem;
+    }
+
+    /* Saved Projects Modal / Drawer */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 580px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      transform: translateY(12px) scale(0.98);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      padding: 1.15rem 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+    }
+
+    .modal-content {
+      padding: 1.15rem 1.35rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .saved-item {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .saved-item:hover {
+      border-color: #3f527c;
+      background: #1e2c49;
+    }
+
+    .saved-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .saved-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .saved-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .saved-price-tag {
+      font-weight: 600;
+      color: var(--accent-bambu);
+    }
+
+    .saved-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .empty-saved {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-saved svg {
+      width: 44px;
+      height: 44px;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #0f172a;
+      border: 1px solid var(--accent-bambu);
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-bambu-glow);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Responsive Tweaks */
+    @media (max-width: 640px) {
+      body {
+        padding: 0.75rem 0.6rem 2rem;
+      }
+      .suggested-price-val {
+        font-size: 2.1rem;
+      }
+      .card {
+        padding: 1rem;
+      }
+      header {
+        margin-bottom: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <!-- 3D Cube / Spool Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M21 16.5l-9 5.2-9-5.2V7.5l9-5.2 9 5.2v9zM12 4.1L5.1 8 12 11.9 18.9 8 12 4.1zm-7 5.7v6.3l7 4v-6.3l-7-4zm9 10.3l7-4V9.8l-7 4v6.3z"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>
+            Calculadora 3D
+            <span class="badge-bambu">Bambu Lab A1 Mini</span>
+          </h1>
+          <p>Custos operacionais e precificação profissional de peças impressas</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn btn-ghost" id="btnOpenSaved" title="Ver projetos salvos">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          Projetos Salvos (<span id="savedProjectsCount">0</span>)
+        </button>
+
+        <button type="button" class="btn btn-primary btn-sm" id="btnSaveCurrentProject">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          </svg>
+          Salvar Projeto
+        </button>
+
+        <button type="button" class="btn btn-ghost btn-sm" id="btnClearProject" title="Limpar dados do projeto atual">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Limpar
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+      <!-- Left Column: Inputs & Machine Parameters -->
+      <div class="inputs-column">
+
+        <!-- Section A: Dados do Projeto -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+              A. Dados do Projeto
+            </h2>
+            <span class="card-badge">Bambu Studio</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group col-span-2">
+              <label for="projectName">Nome do projeto / peça</label>
+              <div class="input-wrapper">
+                <input type="text" id="projectName" placeholder="Ex: Articulated Dragon, Suporte Headset..." value="Suporte de Fone Articulado">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="filamentPrice">Preço do filamento por kg</label>
+              <div class="input-wrapper">
+                <span class="input-affix input-affix-prefix">R$</span>
+                <input type="text" id="filamentPrice" inputmode="decimal" value="110,00" placeholder="110,00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="filamentGrams">Quantidade de filamento</label>
+              <div class="input-wrapper">
+                <input type="text" id="filamentGrams" inputmode="decimal" value="45" placeholder="45">
+                <span class="input-affix input-affix-suffix">g</span>
+              </div>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label>Tempo de impressão (horas e minutos)</label>
+              <div class="time-dual-wrapper">
+                <div class="input-wrapper">
+                  <input type="number" id="printHours" min="0" value="1" placeholder="0">
+                  <span class="input-affix input-affix-suffix">horas</span>
+                </div>
+                <div class="input-wrapper">
+                  <input type="number" id="printMinutes" min="0" max="59" value="45" placeholder="0">
+                  <span class="input-affix input-affix-suffix">min</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="energyTariff">Tarifa de energia elétrica</label>
+              <div class="input-wrapper">
+                <span class="input-affix input-affix-prefix">R$</span>
+                <input type="text" id="energyTariff" inputmode="decimal" value="0,85" placeholder="0,85">
+                <span class="input-affix input-affix-suffix">/kWh</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="powerWatts">
+                Potência média da impressora
+                <span class="label-hint">estimativa editável (PLA)</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="powerWatts" inputmode="decimal" value="80" placeholder="80">
+                <span class="input-affix input-affix-suffix">W</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="packagingCost">Custo de embalagem</label>
+              <div class="input-wrapper">
+                <span class="input-affix input-affix-prefix">R$</span>
+                <input type="text" id="packagingCost" inputmode="decimal" value="2,50" placeholder="0,00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="otherCosts">Outros custos adicionais</label>
+              <div class="input-wrapper">
+                <span class="input-affix input-affix-prefix">R$</span>
+                <input type="text" id="otherCosts" inputmode="decimal" value="0,00" placeholder="0,00">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section B: Custos Operacionais da Impressora (Collapsible, starts closed) -->
+        <details class="accordion-card" id="machineAccordion">
+          <summary>
+            <div class="summary-left">
+              <div class="summary-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </div>
+              <div class="summary-text">
+                <h3>Custos da Bambu Lab A1 Mini</h3>
+                <p>Depreciação, manutenção horária, desperdício e reserva de falhas</p>
+              </div>
+            </div>
+            <div class="summary-chevron">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </summary>
+
+          <div class="accordion-body">
+            <div class="form-grid" style="margin-top: 1rem;">
+              <div class="form-group">
+                <label for="printerCost">Valor de aquisição da impressora</label>
+                <div class="input-wrapper">
+                  <span class="input-affix input-affix-prefix">R$</span>
+                  <input type="text" id="printerCost" inputmode="decimal" value="2.400,00" placeholder="2400,00">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="printerLifespan">
+                  Vida útil estimada
+                  <span class="label-hint">> 0</span>
+                </label>
+                <div class="input-wrapper">
+                  <input type="text" id="printerLifespan" inputmode="numeric" value="3000" placeholder="3000">
+                  <span class="input-affix input-affix-suffix">horas</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="maintenancePerHour">
+                  Reserva para manutenção / hora
+                  <span class="label-hint">bico, graxa, desgastes</span>
+                </label>
+                <div class="input-wrapper">
+                  <span class="input-affix input-affix-prefix">R$</span>
+                  <input type="text" id="maintenancePerHour" inputmode="decimal" value="0,80" placeholder="0,80">
+                  <span class="input-affix input-affix-suffix">/h</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="laborCost">Custo opcional de mão de obra</label>
+                <div class="input-wrapper">
+                  <span class="input-affix input-affix-prefix">R$</span>
+                  <input type="text" id="laborCost" inputmode="decimal" value="0,00" placeholder="0,00">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="filamentWastePercent">
+                  Desperdício de filamento
+                  <span class="label-hint">purga / calibração</span>
+                </label>
+                <div class="input-wrapper">
+                  <input type="text" id="filamentWastePercent" inputmode="decimal" value="5,0" placeholder="5">
+                  <span class="input-affix input-affix-suffix">%</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="failureReservePercent">
+                  Reserva para falhas de impressão
+                  <span class="label-hint">provisão de risco</span>
+                </label>
+                <div class="input-wrapper">
+                  <input type="text" id="failureReservePercent" inputmode="decimal" value="5,0" placeholder="5">
+                  <span class="input-affix input-affix-suffix">%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Breakdown of hourly rates: Depreciação e Manutenção separadas -->
+            <div class="sub-callout">
+              <div class="callout-metric">
+                <span>Depreciação por Hora</span>
+                <span id="rateDepreciationPerHour">R$ 0,80/h</span>
+              </div>
+              <div class="callout-metric">
+                <span>Manutenção por Hora</span>
+                <span id="rateMaintenancePerHour">R$ 0,80/h</span>
+              </div>
+              <div class="callout-metric">
+                <span>Custo Horário da Máquina</span>
+                <span id="rateMachineTotalPerHour" style="color:#4ade80;">R$ 1,60/h</span>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section C: Precificação e Lucro -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              C. Precificação e Lucro
+            </h2>
+            <span class="card-badge" id="currentMethodBadge">Método: Markup</span>
+          </div>
+
+          <!-- Pricing Method Selection Tabs -->
+          <div class="tabs-pricing">
+            <button type="button" class="tab-btn active" id="tabMarkup" data-method="markup">
+              Markup sobre o Custo
+            </button>
+            <button type="button" class="tab-btn" id="tabMargin" data-method="margin">
+              Margem de Lucro Desejada
+            </button>
+          </div>
+
+          <!-- Educational Explanation & Practical Difference -->
+          <div class="method-explanation" id="methodExplanation">
+            <div class="method-explanation-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Atenção: Markup de 30% não equivale a Margem Líquida de 30%!</span>
+            </div>
+            <div id="methodExplanationBody">
+              O <strong>Markup</strong> incide sobre o que você gastou (custo). A <strong>Margem</strong> é a fatia do que você recebe (preço final).
+            </div>
+            <div class="comparison-micro-table">
+              <div><strong>Com Markup de 30%:</strong><br>Custo R$ 10 → Preço R$ 13,00 (Lucro R$ 3,00 = <em>Margem de 23,1%</em>)</div>
+              <div><strong>Com Margem de 30%:</strong><br>Custo R$ 10 → Preço R$ 14,29 (Lucro R$ 4,29 = <em>Margem de 30,0%</em>)</div>
+            </div>
+          </div>
+
+          <!-- Validation Alert Container -->
+          <div class="alert-banner" id="pricingAlert">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span id="pricingAlertMessage">A soma da margem desejada e da taxa de plataforma não pode ser igual ou superior a 100%.</span>
+          </div>
+
+          <div class="form-grid">
+            <!-- Active Rate Input (Markup or Margin) -->
+            <div class="form-group col-span-2" id="groupProfitRate">
+              <label for="profitRateInput">
+                <span id="profitRateLabel">Percentual de Markup sobre o custo</span>
+                <span class="label-hint" id="profitRateEquivalent">Margem correspondente: ~33,3%</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="profitRateInput" inputmode="decimal" value="50,0" placeholder="50">
+                <span class="input-affix input-affix-suffix">%</span>
+              </div>
+            </div>
+
+            <!-- Platform / Sales Percent Fee -->
+            <div class="form-group">
+              <label for="platformFeePercent">
+                Taxa percentual de plataforma (opcional)
+                <span class="label-hint">Mercado Livre, Shopee...</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="platformFeePercent" inputmode="decimal" value="0,0" placeholder="0">
+                <span class="input-affix input-affix-suffix">%</span>
+              </div>
+            </div>
+
+            <!-- Platform Fixed Fee -->
+            <div class="form-group">
+              <label for="fixedFee">Taxa fixa por venda (opcional)</label>
+              <div class="input-wrapper">
+                <span class="input-affix input-affix-prefix">R$</span>
+                <input type="text" id="fixedFee" inputmode="decimal" value="0,00" placeholder="0,00">
+              </div>
+            </div>
+
+            <!-- Rounding toggle -->
+            <div class="form-group col-span-2">
+              <label class="checkbox-container">
+                <input type="checkbox" id="roundUpCheckbox">
+                <span class="checkbox-label">Arredondar o preço sugerido para cima (até o próximo real)</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Results Dashboard -->
+      <div class="results-panel">
+
+        <!-- Highlighted Cards -->
+        <div class="card kpi-main-card">
+          <div class="suggested-price-box">
+            <div class="suggested-price-label">Preço Sugerido de Venda</div>
+            <div class="suggested-price-val">
+              <span class="currency">R$</span><span id="displaySuggestedPrice">0,00</span>
+            </div>
+            <div id="displayRoundingNote" class="rounding-diff-tag" style="display: none;">
+              Antes do arredondamento: R$ 0,00
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi-item">
+              <div class="kpi-item-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                Custo Total de Produção
+              </div>
+              <div class="kpi-item-val cost" id="displayTotalCost">R$ 0,00</div>
+            </div>
+
+            <div class="kpi-item">
+              <div class="kpi-item-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                Lucro Estimado por Peça
+              </div>
+              <div class="kpi-item-val profit" id="displayEstimatedProfit">R$ 0,00</div>
+            </div>
+
+            <div class="kpi-item">
+              <div class="kpi-item-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                Margem Efetiva de Lucro
+              </div>
+              <div class="kpi-item-val margin" id="displayEffectiveMargin">0,0%</div>
+            </div>
+
+            <div class="kpi-item">
+              <div class="kpi-item-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Custo por Hora de Impressão
+              </div>
+              <div class="kpi-item-val hourly" id="displayCostPerHour">R$ 0,00/h</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost Distribution Visual Chart (SVG Donut + CSS Bar) -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <span>Distribuição dos Custos</span>
+            <span id="chartTotalLabel" style="color: #ffffff; font-weight: 700;">R$ 0,00</span>
+          </div>
+
+          <div class="chart-body-wrapper">
+            <div class="donut-container">
+              <svg viewBox="0 0 140 140" id="donutSvg">
+                <!-- Slices rendered dynamically -->
+              </svg>
+              <div class="donut-center-text">
+                <span class="donut-center-label">CUSTO</span>
+                <span class="donut-center-val" id="donutCenterVal">R$ 0,00</span>
+              </div>
+            </div>
+
+            <!-- Legend Chips -->
+            <div class="chart-legend" id="chartLegend">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Progress Segmented Bar -->
+          <div class="cost-progress-bar" id="costProgressBar" title="Composição proporcional dos custos">
+            <!-- Dynamic segments injected by JS -->
+          </div>
+        </div>
+
+        <!-- Detailed Breakdown Table (Exact match to specification) -->
+        <div class="card" style="padding: 1.15rem;">
+          <div class="card-header" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem;">
+            <h3 class="card-title" style="font-size: 0.95rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              Detalhamento dos Custos
+            </h3>
+          </div>
+
+          <div class="table-container">
+            <table class="cost-table">
+              <thead>
+                <tr>
+                  <th>Componente</th>
+                  <th class="text-right">Custo</th>
+                </tr>
+              </thead>
+              <tbody id="costTableBody">
+                <!-- Rows injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-panel-buttons">
+            <button type="button" class="btn btn-primary" id="btnCopyBudget">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copiar Orçamento (WhatsApp)
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      Calculadora de Precificação para Impressão 3D &bull; Bambu Lab A1 Mini &bull; Funciona 100% Offline no Navegador
+    </footer>
+  </div>
+
+  <!-- Saved Projects Modal -->
+  <div class="modal-overlay" id="projectsModal" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          Projetos Salvos
+        </h3>
+        <button type="button" class="modal-close-btn" id="btnCloseModal" title="Fechar">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div class="saved-list" id="savedProjectsList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastNotification" role="alert">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span id="toastMessage">Orçamento copiado com sucesso!</span>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    (function () {
+      'use strict';
+
+      // --- CONFIGURATION & STORAGE KEYS ---
+      const STORAGE_KEYS = {
+        CONFIG: 'bambu_calc_config_v1',
+        PROJECTS: 'bambu_calc_projects_v1',
+        CURRENT_STATE: 'bambu_calc_current_state_v1'
+      };
+
+      // Palette for Cost Categories
+      const CATEGORY_COLORS = {
+        filament: '#10b981',       // Emerald
+        waste: '#f59e0b',          // Amber
+        energy: '#06b6d4',         // Cyan
+        depreciation: '#8b5cf6',   // Purple
+        maintenance: '#3b82f6',    // Blue
+        packaging: '#ec4899',      // Pink
+        labor: '#eab308',          // Yellow
+        others: '#64748b',         // Slate
+        failures: '#f43f5e'        // Rose
+      };
+
+      // Default Machine Settings
+      const DEFAULT_MACHINE_CONFIG = {
+        printerCost: '2.400,00',
+        printerLifespan: '3000',
+        maintenancePerHour: '0,80',
+        powerWatts: '80',
+        energyTariff: '0,85',
+        filamentWastePercent: '5,0',
+        failureReservePercent: '5,0'
+      };
+
+      // State Management
+      let state = {
+        method: 'markup', // 'markup' | 'margin'
+        roundUp: false,
+        calcResults: null
+      };
+
+      // DOM Elements Cache
+      const dom = {
+        // Inputs Section A
+        projectName: document.getElementById('projectName'),
+        filamentPrice: document.getElementById('filamentPrice'),
+        filamentGrams: document.getElementById('filamentGrams'),
+        printHours: document.getElementById('printHours'),
+        printMinutes: document.getElementById('printMinutes'),
+        energyTariff: document.getElementById('energyTariff'),
+        powerWatts: document.getElementById('powerWatts'),
+        packagingCost: document.getElementById('packagingCost'),
+        otherCosts: document.getElementById('otherCosts'),
+
+        // Inputs Section B
+        printerCost: document.getElementById('printerCost'),
+        printerLifespan: document.getElementById('printerLifespan'),
+        maintenancePerHour: document.getElementById('maintenancePerHour'),
+        laborCost: document.getElementById('laborCost'),
+        filamentWastePercent: document.getElementById('filamentWastePercent'),
+        failureReservePercent: document.getElementById('failureReservePercent'),
+        rateDepreciationPerHour: document.getElementById('rateDepreciationPerHour'),
+        rateMaintenancePerHour: document.getElementById('rateMaintenancePerHour'),
+        rateMachineTotalPerHour: document.getElementById('rateMachineTotalPerHour'),
+
+        // Inputs Section C
+        tabMarkup: document.getElementById('tabMarkup'),
+        tabMargin: document.getElementById('tabMargin'),
+        currentMethodBadge: document.getElementById('currentMethodBadge'),
+        methodExplanationBody: document.getElementById('methodExplanationBody'),
+        profitRateLabel: document.getElementById('profitRateLabel'),
+        profitRateEquivalent: document.getElementById('profitRateEquivalent'),
+        profitRateInput: document.getElementById('profitRateInput'),
+        platformFeePercent: document.getElementById('platformFeePercent'),
+        fixedFee: document.getElementById('fixedFee'),
+        roundUpCheckbox: document.getElementById('roundUpCheckbox'),
+        pricingAlert: document.getElementById('pricingAlert'),
+        pricingAlertMessage: document.getElementById('pricingAlertMessage'),
+
+        // Results Displays
+        displaySuggestedPrice: document.getElementById('displaySuggestedPrice'),
+        displayRoundingNote: document.getElementById('displayRoundingNote'),
+        displayTotalCost: document.getElementById('displayTotalCost'),
+        displayEstimatedProfit: document.getElementById('displayEstimatedProfit'),
+        displayEffectiveMargin: document.getElementById('displayEffectiveMargin'),
+        displayCostPerHour: document.getElementById('displayCostPerHour'),
+        chartTotalLabel: document.getElementById('chartTotalLabel'),
+        donutSvg: document.getElementById('donutSvg'),
+        donutCenterVal: document.getElementById('donutCenterVal'),
+        costProgressBar: document.getElementById('costProgressBar'),
+        chartLegend: document.getElementById('chartLegend'),
+        costTableBody: document.getElementById('costTableBody'),
+
+        // Actions
+        btnSaveCurrentProject: document.getElementById('btnSaveCurrentProject'),
+        btnOpenSaved: document.getElementById('btnOpenSaved'),
+        btnClearProject: document.getElementById('btnClearProject'),
+        btnCopyBudget: document.getElementById('btnCopyBudget'),
+        savedProjectsCount: document.getElementById('savedProjectsCount'),
+
+        // Modal
+        projectsModal: document.getElementById('projectsModal'),
+        btnCloseModal: document.getElementById('btnCloseModal'),
+        savedProjectsList: document.getElementById('savedProjectsList'),
+
+        // Toast
+        toastNotification: document.getElementById('toastNotification'),
+        toastMessage: document.getElementById('toastMessage')
+      };
+
+      // --- HELPER FUNCTIONS ---
+
+      /**
+       * Parse text input into a safe floating point number.
+       * Supports Brazilian format (1.234,56 or 1234,56) and US format (1,234.56 or 1234.56).
+       * Never returns NaN or negative numbers.
+       */
+      function parseNumeric(val) {
+        if (typeof val === 'number') {
+          return isNaN(val) || !isFinite(val) ? 0 : Math.max(0, val);
+        }
+        if (!val || typeof val !== 'string') return 0;
+
+        let clean = val.trim();
+        if (!clean) return 0;
+
+        const hasComma = clean.includes(',');
+        const hasDot = clean.includes('.');
+
+        if (hasComma && hasDot) {
+          if (clean.lastIndexOf(',') > clean.lastIndexOf('.')) {
+            // Brazilian format: 2.400,50 -> remove dots, replace comma with dot
+            clean = clean.replace(/\./g, '').replace(',', '.');
+          } else {
+            // US format: 2,400.50 -> remove commas
+            clean = clean.replace(/,/g, '');
+          }
+        } else if (hasComma) {
+          // Only comma: 110,50 -> replace comma with dot
+          clean = clean.replace(',', '.');
+        }
+
+        // Remove any remaining invalid characters except digits, minus, and dot
+        clean = clean.replace(/[^0-9.-]/g, '');
+        const num = parseFloat(clean);
+        return isNaN(num) || !isFinite(num) ? 0 : Math.max(0, num);
+      }
+
+      /**
+       * Formats a number to Brazilian Currency (R$ 1.234,56)
+       */
+      function formatBRL(amount) {
+        if (!isFinite(amount) || isNaN(amount)) amount = 0;
+        return amount.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      /**
+       * Formats currency without the "R$" prefix
+       */
+      function formatBRLRaw(amount) {
+        if (!isFinite(amount) || isNaN(amount)) amount = 0;
+        return amount.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      /**
+       * Formats a percentage value (e.g. 33,3%)
+       */
+      function formatPercent(value, decimals = 1) {
+        if (!isFinite(value) || isNaN(value)) value = 0;
+        return value.toLocaleString('pt-BR', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        }) + '%';
+      }
+
+      /**
+       * Display toast notification
+       */
+      let toastTimer = null;
+      function showToast(message) {
+        dom.toastMessage.textContent = message;
+        dom.toastNotification.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          dom.toastNotification.classList.remove('show');
+        }, 3200);
+      }
+
+      // --- MATHEMATICAL CALCULATIONS ---
+
+      function calculateAll() {
+        // Collect & Parse Project Data
+        const precoKg = parseNumeric(dom.filamentPrice.value);
+        const gramas = parseNumeric(dom.filamentGrams.value);
+        const horas = Math.floor(parseNumeric(dom.printHours.value));
+        const minutos = parseNumeric(dom.printMinutes.value);
+        const tarifaKwh = parseNumeric(dom.energyTariff.value);
+        const potenciaWatts = parseNumeric(dom.powerWatts.value);
+        const custoEmbalagem = parseNumeric(dom.packagingCost.value);
+        const outrosCustos = parseNumeric(dom.otherCosts.value);
+
+        // Collect & Parse Printer Operational Data
+        const valorImpressora = parseNumeric(dom.printerCost.value);
+        const vidaUtilHoras = parseNumeric(dom.printerLifespan.value);
+        const reservaManutencaoHora = parseNumeric(dom.maintenancePerHour.value);
+        const maoDeObra = parseNumeric(dom.laborCost.value);
+        const desperdicioPercentual = parseNumeric(dom.filamentWastePercent.value);
+        const percentualFalhas = parseNumeric(dom.failureReservePercent.value);
+
+        // Collect & Parse Pricing Data
+        const taxaPlataforma = parseNumeric(dom.platformFeePercent.value);
+        const taxaFixa = parseNumeric(dom.fixedFee.value);
+        const inputTaxaLucro = parseNumeric(dom.profitRateInput.value);
+
+        // 1. Filament formulas:
+        // custoFilamento = (gramas / 1000) * precoKg
+        // custoFilamentoComDesperdicio = custoFilamento * (1 + desperdicioPercentual / 100)
+        const custoFilamento = (gramas / 1000) * precoKg;
+        const custoFilamentoComDesperdicio = custoFilamento * (1 + desperdicioPercentual / 100);
+        const custoDesperdicio = Math.max(0, custoFilamentoComDesperdicio - custoFilamento);
+
+        // 2. Time & Energy formulas:
+        // tempoHoras = horas + minutos / 60
+        // consumoKwh = (potenciaWatts / 1000) * tempoHoras
+        // custoEnergia = consumoKwh * tarifaKwh
+        const tempoHoras = horas + (minutos / 60);
+        const consumoKwh = (potenciaWatts / 1000) * tempoHoras;
+        const custoEnergia = consumoKwh * tarifaKwh;
+
+        // 3. Machine Depreciation & Maintenance formulas:
+        // depreciacaoHora = valorImpressora / vidaUtilHoras
+        // custoDepreciacao = depreciacaoHora * tempoHoras
+        // custoManutencao = reservaManutencaoHora * tempoHoras
+        const depreciacaoHora = vidaUtilHoras > 0 ? (valorImpressora / vidaUtilHoras) : 0;
+        const custoDepreciacao = depreciacaoHora * tempoHoras;
+        const custoManutencao = reservaManutencaoHora * tempoHoras;
+
+        // Update hourly rate badges in section B (Depreciação e Manutenção separadas)
+        dom.rateDepreciationPerHour.textContent = formatBRL(depreciacaoHora) + '/h';
+        dom.rateMaintenancePerHour.textContent = formatBRL(reservaManutencaoHora) + '/h';
+        dom.rateMachineTotalPerHour.textContent = formatBRL(depreciacaoHora + reservaManutencaoHora) + '/h';
+
+        // 4. Base Cost formula:
+        // custoBase = filamentoComDesperdicio + energia + depreciacao + manutencao + embalagem + outrosCustos + maoDeObra
+        const custoBase = custoFilamentoComDesperdicio +
+                          custoEnergia +
+                          custoDepreciacao +
+                          custoManutencao +
+                          custoEmbalagem +
+                          outrosCustos +
+                          maoDeObra;
+
+        // 5. Failure Reserve formula:
+        // custoReservaFalhas = custoBase * (percentualFalhas / 100)
+        const custoReservaFalhas = custoBase * (percentualFalhas / 100);
+
+        // 6. Total Production Cost:
+        // custoTotal = custoBase + custoReservaFalhas
+        const custoTotal = custoBase + custoReservaFalhas;
+
+        // 7. Pricing & Profit formulas
+        let precoVendaOriginal = 0;
+        let precoVendaFinal = 0;
+        let lucroEstimado = 0;
+        let margemEfetiva = 0;
+        let markupEfetivo = 0;
+        let hasValidationError = false;
+        let validationMsg = '';
+
+        if (state.method === 'markup') {
+          // Preço por markup:
+          // precoVenda = (custoTotal * (1 + markup / 100) + taxaFixa) / (1 - taxaPlataforma / 100)
+          const markup = inputTaxaLucro;
+          const denom = 1 - (taxaPlataforma / 100);
+
+          if (taxaPlataforma >= 100 || denom <= 0) {
+            hasValidationError = true;
+            validationMsg = 'A taxa percentual da plataforma não pode ser igual ou superior a 100%.';
+          } else {
+            precoVendaOriginal = (custoTotal * (1 + markup / 100) + taxaFixa) / denom;
+          }
+
+          // Live equivalent net margin hint
+          if (precoVendaOriginal > 0) {
+            const tempProfit = precoVendaOriginal - custoTotal - taxaFixa - (precoVendaOriginal * (taxaPlataforma / 100));
+            const equivMargin = (tempProfit / precoVendaOriginal) * 100;
+            dom.profitRateEquivalent.textContent = `Margem líquida correspondente: ~${formatPercent(equivMargin)}`;
+          } else {
+            dom.profitRateEquivalent.textContent = `Margem correspondente: ~0%`;
+          }
+
+        } else {
+          // Preço por margem:
+          // precoVenda = (custoTotal + taxaFixa) / (1 - margem / 100 - taxaPlataforma / 100)
+          const margem = inputTaxaLucro;
+          const denom = 1 - (margem / 100) - (taxaPlataforma / 100);
+
+          // Validation requirement: Caso a soma da margem desejada e da taxa percentual de plataforma seja igual ou superior a 100%, exibir erro de validação.
+          if (margem + taxaPlataforma >= 100 || denom <= 0) {
+            hasValidationError = true;
+            validationMsg = 'A soma da margem desejada e da taxa percentual de plataforma não pode ser igual ou superior a 100%.';
+          } else {
+            precoVendaOriginal = (custoTotal + taxaFixa) / denom;
+          }
+
+          // Live equivalent markup hint
+          if (custoTotal > 0 && precoVendaOriginal > 0) {
+            const equivMarkup = ((precoVendaOriginal - custoTotal) / custoTotal) * 100;
+            dom.profitRateEquivalent.textContent = `Markup sobre custo correspondente: ~${formatPercent(equivMarkup)}`;
+          } else {
+            dom.profitRateEquivalent.textContent = `Markup correspondente: ~0%`;
+          }
+        }
+
+        // Apply Rounding if enabled (arredondar para cima até o próximo real)
+        if (!hasValidationError && precoVendaOriginal > 0) {
+          if (state.roundUp) {
+            precoVendaFinal = Math.ceil(precoVendaOriginal);
+          } else {
+            precoVendaFinal = precoVendaOriginal;
+          }
+
+          // Lucro estimado:
+          // lucro = precoVenda - custoTotal - taxaFixa - (precoVenda * taxaPlataforma / 100)
+          lucroEstimado = precoVendaFinal - custoTotal - taxaFixa - (precoVendaFinal * (taxaPlataforma / 100));
+
+          // Margem efetiva:
+          // margemEfetiva = lucro / precoVenda * 100
+          margemEfetiva = precoVendaFinal > 0 ? (lucroEstimado / precoVendaFinal) * 100 : 0;
+
+          // Markup efetivo:
+          markupEfetivo = custoTotal > 0 ? ((precoVendaFinal - custoTotal) / custoTotal) * 100 : 0;
+        }
+
+        // Custo por hora de impressão:
+        const custoPorHora = tempoHoras > 0 ? (custoTotal / tempoHoras) : 0;
+
+        // Pack result state
+        state.calcResults = {
+          hasValidationError,
+          validationMsg,
+          precoKg,
+          gramas,
+          horas,
+          minutos,
+          tempoHoras,
+          consumoKwh,
+          custoFilamento,
+          custoDesperdicio,
+          custoFilamentoComDesperdicio,
+          custoEnergia,
+          depreciacaoHora,
+          custoDepreciacao,
+          reservaManutencaoHora,
+          custoManutencao,
+          custoEmbalagem,
+          maoDeObra,
+          outrosCustos,
+          custoReservaFalhas,
+          custoBase,
+          custoTotal,
+          precoVendaOriginal,
+          precoVendaFinal,
+          lucroEstimado,
+          margemEfetiva,
+          markupEfetivo,
+          custoPorHora,
+          taxaPlataforma,
+          taxaFixa
+        };
+
+        renderResults();
+        saveCurrentStateToLocalStorage();
+      }
+
+      // --- RENDERING RESULTS ---
+
+      function renderResults() {
+        const r = state.calcResults;
+        if (!r) return;
+
+        // Handle Validation Alert
+        if (r.hasValidationError) {
+          dom.pricingAlert.classList.add('show');
+          dom.pricingAlertMessage.textContent = r.validationMsg;
+          dom.displaySuggestedPrice.textContent = '---';
+          dom.displayRoundingNote.style.display = 'none';
+          dom.displayEstimatedProfit.textContent = '---';
+          dom.displayEffectiveMargin.textContent = '---';
+        } else {
+          dom.pricingAlert.classList.remove('show');
+          dom.displaySuggestedPrice.textContent = formatBRLRaw(r.precoVendaFinal);
+
+          // Apresentar os valores antes e depois do arredondamento quando houver diferença
+          const diff = r.precoVendaFinal - r.precoVendaOriginal;
+          if (state.roundUp && Math.abs(diff) >= 0.005) {
+            dom.displayRoundingNote.style.display = 'inline-block';
+            dom.displayRoundingNote.textContent = `Antes do arredondamento: ${formatBRL(r.precoVendaOriginal)} (+${formatBRL(diff)})`;
+          } else {
+            dom.displayRoundingNote.style.display = 'none';
+          }
+
+          dom.displayEstimatedProfit.textContent = formatBRL(r.lucroEstimado);
+          dom.displayEffectiveMargin.textContent = formatPercent(r.margemEfetiva);
+        }
+
+        // Cost KPIs (always mathematically valid)
+        dom.displayTotalCost.textContent = formatBRL(r.custoTotal);
+        dom.displayCostPerHour.textContent = formatBRL(r.custoPorHora) + '/h';
+        dom.chartTotalLabel.textContent = formatBRL(r.custoTotal);
+        dom.donutCenterVal.textContent = formatBRL(r.custoTotal);
+
+        // Exact component specification matching prompt table
+        const breakdown = [
+          { key: 'filament', name: 'Filamento', cost: r.custoFilamento, color: CATEGORY_COLORS.filament },
+          { key: 'waste', name: 'Desperdício de filamento', cost: r.custoDesperdicio, color: CATEGORY_COLORS.waste },
+          { key: 'energy', name: 'Energia elétrica', cost: r.custoEnergia, color: CATEGORY_COLORS.energy },
+          { key: 'depreciation', name: 'Depreciação da impressora', cost: r.custoDepreciacao, color: CATEGORY_COLORS.depreciation },
+          { key: 'maintenance', name: 'Manutenção', cost: r.custoManutencao, color: CATEGORY_COLORS.maintenance },
+          { key: 'packaging', name: 'Embalagem', cost: r.custoEmbalagem, color: CATEGORY_COLORS.packaging },
+          { key: 'labor', name: 'Mão de obra', cost: r.maoDeObra, color: CATEGORY_COLORS.labor },
+          { key: 'others', name: 'Outros custos', cost: r.outrosCustos, color: CATEGORY_COLORS.others },
+          { key: 'failures', name: 'Reserva para falhas', cost: r.custoReservaFalhas, color: CATEGORY_COLORS.failures }
+        ];
+
+        renderBreakdownTable(breakdown, r.custoTotal);
+        renderVisualCharts(breakdown, r.custoTotal);
+      }
+
+      function renderBreakdownTable(items, total) {
+        let html = '';
+        items.forEach(item => {
+          html += `
+            <tr>
+              <td>
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${item.color}; margin-right:8px;"></span>
+                ${item.name}
+              </td>
+              <td class="text-right">${formatBRL(item.cost)}</td>
+            </tr>
+          `;
+        });
+
+        // Total row matching prompt table exactly
+        html += `
+          <tr class="row-total">
+            <td><strong>Total</strong></td>
+            <td class="text-right"><strong>${formatBRL(total)}</strong></td>
+          </tr>
+        `;
+
+        dom.costTableBody.innerHTML = html;
+      }
+
+      function renderVisualCharts(items, total) {
+        // 1. Render Segmented Progress Bar & Legend
+        let barHtml = '';
+        let legendHtml = '';
+
+        // 2. Render SVG Donut Chart
+        // Radius 50, Center (70, 70), Circumference = 2 * PI * 50 = 314.159
+        const radius = 50;
+        const circumference = 2 * Math.PI * radius;
+        let cumulativePct = 0;
+        let donutSlicesHtml = '';
+
+        items.forEach(item => {
+          if (item.cost > 0.0001 && total > 0) {
+            const pct = (item.cost / total) * 100;
+            const sliceLength = (pct / 100) * circumference;
+            const strokeDashoffset = -((cumulativePct / 100) * circumference);
+
+            donutSlicesHtml += `
+              <circle
+                cx="70" cy="70" r="${radius}"
+                fill="none"
+                stroke="${item.color}"
+                stroke-width="18"
+                stroke-dasharray="${sliceLength} ${circumference - sliceLength}"
+                stroke-dashoffset="${strokeDashoffset}"
+                style="transition: stroke-dasharray 0.3s ease, stroke-dashoffset 0.3s ease;"
+              />
+            `;
+
+            cumulativePct += pct;
+
+            const tooltip = `${item.name}: ${formatBRL(item.cost)} (${formatPercent(pct)})`;
+            barHtml += `
+              <div class="cost-segment" style="width: ${pct}%; background: ${item.color};" data-tooltip="${tooltip}"></div>
+            `;
+            legendHtml += `
+              <div class="legend-chip">
+                <span class="legend-dot" style="background: ${item.color};"></span>
+                <span>${item.name}: <strong style="color:#fff">${formatPercent(pct, 0)}</strong></span>
+              </div>
+            `;
+          }
+        });
+
+        if (!donutSlicesHtml) {
+          donutSlicesHtml = `
+            <circle cx="70" cy="70" r="${radius}" fill="none" stroke="#24314d" stroke-width="18" />
+          `;
+          barHtml = `<div class="cost-segment" style="width: 100%; background: #24314d;"></div>`;
+          legendHtml = `<span style="font-size:0.75rem; color:var(--text-dim);">Preencha os dados para visualizar a distribuição.</span>`;
+        }
+
+        dom.donutSvg.innerHTML = donutSlicesHtml;
+        dom.costProgressBar.innerHTML = barHtml;
+        dom.chartLegend.innerHTML = legendHtml;
+      }
+
+      // --- METHOD TOGGLE & UI UPDATES ---
+
+      function setPricingMethod(method) {
+        state.method = method;
+
+        if (method === 'markup') {
+          dom.tabMarkup.classList.add('active');
+          dom.tabMargin.classList.remove('active');
+          dom.currentMethodBadge.textContent = 'Método: Markup sobre Custo';
+          dom.profitRateLabel.textContent = 'Percentual de Markup sobre o custo';
+          dom.methodExplanationBody.innerHTML = `
+            No <strong>Markup</strong>, você adiciona uma porcentagem sobre o custo de produção.
+            Por exemplo, 50% sobre um custo de R$ 20 resulta em um acréscimo de R$ 10 (venda a R$ 30, margem real de 33,3%).
+          `;
+        } else {
+          dom.tabMargin.classList.add('active');
+          dom.tabMarkup.classList.remove('active');
+          dom.currentMethodBadge.textContent = 'Método: Margem de Lucro';
+          dom.profitRateLabel.textContent = 'Margem de lucro líquida desejada';
+          dom.methodExplanationBody.innerHTML = `
+            Na <strong>Margem de Lucro</strong>, você define qual percentual do preço de venda final fica no seu bolso.
+            Por exemplo, para ter 35% de margem real em um custo de R$ 20, o preço de venda é calculado como Custo &divide; (1 - 0,35) = R$ 30,77.
+          `;
+        }
+
+        calculateAll();
+      }
+
+      // --- WHATSAPP BUDGET TEXT GENERATION ---
+
+      function generateBudgetText() {
+        const r = state.calcResults;
+        if (!r) return '';
+
+        const projectName = dom.projectName.value.trim() || 'Projeto 3D';
+        const formattedDate = new Date().toLocaleDateString('pt-BR');
+
+        let text = `📦 *ORÇAMENTO DE IMPRESSÃO 3D*\n`;
+        text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        text += `*Projeto:* ${projectName}\n`;
+        text += `*Impressora:* Bambu Lab A1 Mini\n`;
+        text += `*Data:* ${formattedDate}\n\n`;
+
+        text += `⏱️ *Tempo de Impressão:* ${r.horas}h ${r.minutos}min\n`;
+        text += `⚖️ *Material Estimado:* ${r.gramas.toLocaleString('pt-BR')}g (com ${dom.filamentWastePercent.value}% desperdício)\n`;
+        text += `⚡ *Consumo Estimado:* ~${r.consumoKwh.toFixed(3).replace('.', ',')} kWh\n\n`;
+
+        text += `💰 *VALORES:* \n`;
+        text += `• *Preço Sugerido de Venda: ${formatBRL(r.precoVendaFinal)}*`;
+        if (state.roundUp && Math.abs(r.precoVendaFinal - r.precoVendaOriginal) >= 0.005) {
+          text += ` _(exato: ${formatBRL(r.precoVendaOriginal)})_`;
+        }
+        text += `\n• Custo Total de Produção: ${formatBRL(r.custoTotal)}\n`;
+        text += `• Lucro Estimado: ${formatBRL(r.lucroEstimado)} (${formatPercent(r.margemEfetiva)} de margem)\n\n`;
+
+        text += `🔍 *DETALHAMENTO DE CUSTOS:*\n`;
+        text += `• Filamento: ${formatBRL(r.custoFilamento)}\n`;
+        text += `• Desperdício de filamento: ${formatBRL(r.custoDesperdicio)}\n`;
+        text += `• Energia elétrica: ${formatBRL(r.custoEnergia)}\n`;
+        text += `• Depreciação da impressora: ${formatBRL(r.custoDepreciacao)}\n`;
+        text += `• Manutenção: ${formatBRL(r.custoManutencao)}\n`;
+        text += `• Embalagem: ${formatBRL(r.custoEmbalagem)}\n`;
+        if (r.maoDeObra > 0) text += `• Mão de obra: ${formatBRL(r.maoDeObra)}\n`;
+        if (r.outrosCustos > 0) text += `• Outros custos: ${formatBRL(r.outrosCustos)}\n`;
+        text += `• Reserva para falhas: ${formatBRL(r.custoReservaFalhas)}\n`;
+
+        if (r.taxaPlataforma > 0 || r.taxaFixa > 0) {
+          text += `\n🛒 *Taxas Aplicadas:*\n`;
+          if (r.taxaPlataforma > 0) text += `• Taxa de plataforma: ${formatPercent(r.taxaPlataforma)}\n`;
+          if (r.taxaFixa > 0) text += `• Taxa fixa por venda: ${formatBRL(r.taxaFixa)}\n`;
+        }
+
+        text += `\n━━━━━━━━━━━━━━━━━━━━━\n`;
+        text += `_Calculado pela ferramenta de precificação Bambu Lab A1 Mini_`;
+
+        return text;
+      }
+
+      function copyBudgetToClipboard() {
+        const text = generateBudgetText();
+        if (!text) return;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast('✅ Orçamento copiado para a área de transferência!');
+          }).catch(() => {
+            fallbackCopyText(text);
+          });
+        } else {
+          fallbackCopyText(text);
+        }
+      }
+
+      function fallbackCopyText(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          showToast('✅ Orçamento copiado para a área de transferência!');
+        } catch (e) {
+          alert('Não foi possível copiar automaticamente. Selecione e copie manualmente.');
+        }
+        document.body.removeChild(textarea);
+      }
+
+      // --- LOCALSTORAGE & PROJECTS MANAGEMENT ---
+
+      function getSavedProjects() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          console.error('Falha ao ler projetos do localStorage', e);
+          return [];
+        }
+      }
+
+      function saveProjectsList(projects) {
+        try {
+          localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+          updateProjectsBadge();
+        } catch (e) {
+          console.error('Falha ao salvar lista de projetos', e);
+        }
+      }
+
+      function updateProjectsBadge() {
+        const list = getSavedProjects();
+        dom.savedProjectsCount.textContent = list.length;
+      }
+
+      function saveCurrentProject() {
+        const nameInput = dom.projectName.value.trim();
+        const projectName = nameInput || 'Projeto sem título (' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ')';
+
+        const projectData = {
+          id: 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+          name: projectName,
+          updatedAt: new Date().toISOString(),
+          pricingMethod: state.method,
+          roundUp: state.roundUp,
+          inputs: {
+            projectName: projectName,
+            filamentPrice: dom.filamentPrice.value,
+            filamentGrams: dom.filamentGrams.value,
+            printHours: dom.printHours.value,
+            printMinutes: dom.printMinutes.value,
+            energyTariff: dom.energyTariff.value,
+            powerWatts: dom.powerWatts.value,
+            packagingCost: dom.packagingCost.value,
+            otherCosts: dom.otherCosts.value,
+            printerCost: dom.printerCost.value,
+            printerLifespan: dom.printerLifespan.value,
+            maintenancePerHour: dom.maintenancePerHour.value,
+            laborCost: dom.laborCost.value,
+            filamentWastePercent: dom.filamentWastePercent.value,
+            failureReservePercent: dom.failureReservePercent.value,
+            profitRateInput: dom.profitRateInput.value,
+            platformFeePercent: dom.platformFeePercent.value,
+            fixedFee: dom.fixedFee.value
+          },
+          summary: {
+            totalCost: state.calcResults ? state.calcResults.custoTotal : 0,
+            suggestedPrice: state.calcResults ? state.calcResults.precoVendaFinal : 0,
+            profit: state.calcResults ? state.calcResults.lucroEstimado : 0
+          }
+        };
+
+        const projects = getSavedProjects();
+        const existingIdx = projects.findIndex(p => p.name.toLowerCase() === projectName.toLowerCase());
+        if (existingIdx >= 0) {
+          if (confirm(`Já existe um projeto salvo com o nome "${projectName}". Deseja atualizar o existente?`)) {
+            projectData.id = projects[existingIdx].id;
+            projects[existingIdx] = projectData;
+          } else {
+            projectData.name += ' (Cópia)';
+            projects.unshift(projectData);
+          }
+        } else {
+          projects.unshift(projectData);
+        }
+
+        saveProjectsList(projects);
+        showToast(`📁 Projeto "${projectData.name}" salvo com sucesso!`);
+      }
+
+      function loadProject(project) {
+        if (!project || !project.inputs) return;
+
+        const i = project.inputs;
+        dom.projectName.value = project.name || '';
+        dom.filamentPrice.value = i.filamentPrice || '110,00';
+        dom.filamentGrams.value = i.filamentGrams || '45';
+        dom.printHours.value = i.printHours !== undefined ? i.printHours : 1;
+        dom.printMinutes.value = i.printMinutes !== undefined ? i.printMinutes : 45;
+        dom.energyTariff.value = i.energyTariff || '0,85';
+        dom.powerWatts.value = i.powerWatts || '80';
+        dom.packagingCost.value = i.packagingCost || '2,50';
+        dom.otherCosts.value = i.otherCosts || '0,00';
+
+        // Machine configs
+        if (i.printerCost) dom.printerCost.value = i.printerCost;
+        if (i.printerLifespan) dom.printerLifespan.value = i.printerLifespan;
+        if (i.maintenancePerHour) dom.maintenancePerHour.value = i.maintenancePerHour;
+        if (i.laborCost) dom.laborCost.value = i.laborCost;
+        if (i.filamentWastePercent) dom.filamentWastePercent.value = i.filamentWastePercent;
+        if (i.failureReservePercent) dom.failureReservePercent.value = i.failureReservePercent;
+
+        // Pricing
+        if (i.profitRateInput) dom.profitRateInput.value = i.profitRateInput;
+        if (i.platformFeePercent) dom.platformFeePercent.value = i.platformFeePercent;
+        if (i.fixedFee) dom.fixedFee.value = i.fixedFee;
+
+        state.roundUp = !!project.roundUp;
+        dom.roundUpCheckbox.checked = state.roundUp;
+
+        setPricingMethod(project.pricingMethod || 'markup');
+        closeSavedProjectsModal();
+        showToast(`📂 Projeto "${project.name}" carregado!`);
+      }
+
+      function duplicateProject(projectId) {
+        const projects = getSavedProjects();
+        const found = projects.find(p => p.id === projectId);
+        if (!found) return;
+
+        const clone = JSON.parse(JSON.stringify(found));
+        clone.id = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        clone.name = found.name + ' (Cópia)';
+        clone.updatedAt = new Date().toISOString();
+
+        projects.unshift(clone);
+        saveProjectsList(projects);
+        renderSavedProjectsList();
+        showToast('📋 Projeto duplicado com sucesso!');
+      }
+
+      function deleteProject(projectId) {
+        let projects = getSavedProjects();
+        const found = projects.find(p => p.id === projectId);
+        if (!found) return;
+
+        if (confirm(`Tem certeza que deseja excluir o projeto "${found.name}"?`)) {
+          projects = projects.filter(p => p.id !== projectId);
+          saveProjectsList(projects);
+          renderSavedProjectsList();
+          showToast('🗑️ Projeto removido.');
+        }
+      }
+
+      function renderSavedProjectsList() {
+        const projects = getSavedProjects();
+        dom.savedProjectsList.innerHTML = '';
+
+        if (!projects || projects.length === 0) {
+          dom.savedProjectsList.innerHTML = `
+            <div class="empty-saved">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <p>Nenhum projeto salvo ainda.</p>
+              <p style="font-size:0.75rem; color:var(--text-dim); margin-top:0.3rem;">Preencha os dados e clique em "Salvar Projeto" para guardá-lo aqui.</p>
+            </div>
+          `;
+          return;
+        }
+
+        projects.forEach(proj => {
+          const item = document.createElement('div');
+          item.className = 'saved-item';
+
+          const infoDiv = document.createElement('div');
+          infoDiv.className = 'saved-info';
+
+          // Safe DOM API usage for project names (prevents XSS)
+          const nameEl = document.createElement('div');
+          nameEl.className = 'saved-name';
+          nameEl.textContent = proj.name;
+
+          const metaEl = document.createElement('div');
+          metaEl.className = 'saved-meta';
+
+          const dateStr = new Date(proj.updatedAt).toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          const priceVal = proj.summary && proj.summary.suggestedPrice ? formatBRL(proj.summary.suggestedPrice) : '---';
+          const costVal = proj.summary && proj.summary.totalCost ? formatBRL(proj.summary.totalCost) : '---';
+
+          metaEl.innerHTML = `
+            <span>${dateStr}</span>
+            <span>Custo: ${costVal}</span>
+            <span class="saved-price-tag">Venda: ${priceVal}</span>
+          `;
+
+          infoDiv.appendChild(nameEl);
+          infoDiv.appendChild(metaEl);
+
+          const actionsDiv = document.createElement('div');
+          actionsDiv.className = 'saved-actions';
+
+          // Open Button
+          const btnLoad = document.createElement('button');
+          btnLoad.className = 'btn btn-ghost btn-sm';
+          btnLoad.title = 'Abrir projeto';
+          btnLoad.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            </svg>
+            Abrir
+          `;
+          btnLoad.addEventListener('click', () => loadProject(proj));
+
+          // Duplicate Button
+          const btnDup = document.createElement('button');
+          btnDup.className = 'btn btn-ghost btn-sm';
+          btnDup.title = 'Duplicar projeto';
+          btnDup.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          `;
+          btnDup.addEventListener('click', () => duplicateProject(proj.id));
+
+          // Delete Button
+          const btnDel = document.createElement('button');
+          btnDel.className = 'btn btn-danger-ghost btn-sm';
+          btnDel.title = 'Excluir projeto';
+          btnDel.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          `;
+          btnDel.addEventListener('click', () => deleteProject(proj.id));
+
+          actionsDiv.appendChild(btnLoad);
+          actionsDiv.appendChild(btnDup);
+          actionsDiv.appendChild(btnDel);
+
+          item.appendChild(infoDiv);
+          item.appendChild(actionsDiv);
+          dom.savedProjectsList.appendChild(item);
+        });
+      }
+
+      function openSavedProjectsModal() {
+        renderSavedProjectsList();
+        dom.projectsModal.classList.add('active');
+        dom.projectsModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeSavedProjectsModal() {
+        dom.projectsModal.classList.remove('active');
+        dom.projectsModal.setAttribute('aria-hidden', 'true');
+      }
+
+      function clearProjectInputs() {
+        if (!confirm('Deseja limpar os dados do projeto atual? As configurações padrão da máquina serão preservadas.')) {
+          return;
+        }
+
+        dom.projectName.value = '';
+        dom.filamentGrams.value = '0';
+        dom.printHours.value = '0';
+        dom.printMinutes.value = '0';
+        dom.packagingCost.value = '0,00';
+        dom.otherCosts.value = '0,00';
+        dom.laborCost.value = '0,00';
+
+        calculateAll();
+        showToast('Campos do projeto limpos.');
+      }
+
+      function saveCurrentStateToLocalStorage() {
+        try {
+          const snapshot = {
+            method: state.method,
+            roundUp: state.roundUp,
+            projectName: dom.projectName.value,
+            filamentPrice: dom.filamentPrice.value,
+            filamentGrams: dom.filamentGrams.value,
+            printHours: dom.printHours.value,
+            printMinutes: dom.printMinutes.value,
+            energyTariff: dom.energyTariff.value,
+            powerWatts: dom.powerWatts.value,
+            packagingCost: dom.packagingCost.value,
+            otherCosts: dom.otherCosts.value,
+            printerCost: dom.printerCost.value,
+            printerLifespan: dom.printerLifespan.value,
+            maintenancePerHour: dom.maintenancePerHour.value,
+            laborCost: dom.laborCost.value,
+            filamentWastePercent: dom.filamentWastePercent.value,
+            failureReservePercent: dom.failureReservePercent.value,
+            profitRateInput: dom.profitRateInput.value,
+            platformFeePercent: dom.platformFeePercent.value,
+            fixedFee: dom.fixedFee.value
+          };
+          localStorage.setItem(STORAGE_KEYS.CURRENT_STATE, JSON.stringify(snapshot));
+
+          // Also save general machine config
+          const machineConfig = {
+            printerCost: dom.printerCost.value,
+            printerLifespan: dom.printerLifespan.value,
+            maintenancePerHour: dom.maintenancePerHour.value,
+            powerWatts: dom.powerWatts.value,
+            energyTariff: dom.energyTariff.value,
+            filamentWastePercent: dom.filamentWastePercent.value,
+            failureReservePercent: dom.failureReservePercent.value
+          };
+          localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(machineConfig));
+        } catch (e) {
+          // LocalStorage might be disabled or quota reached
+        }
+      }
+
+      function loadPersistedState() {
+        try {
+          // Check for general machine config first
+          const machineRaw = localStorage.getItem(STORAGE_KEYS.CONFIG);
+          if (machineRaw) {
+            const mc = JSON.parse(machineRaw);
+            if (mc.printerCost !== undefined) dom.printerCost.value = mc.printerCost;
+            if (mc.printerLifespan !== undefined) dom.printerLifespan.value = mc.printerLifespan;
+            if (mc.maintenancePerHour !== undefined) dom.maintenancePerHour.value = mc.maintenancePerHour;
+            if (mc.powerWatts !== undefined) dom.powerWatts.value = mc.powerWatts;
+            if (mc.energyTariff !== undefined) dom.energyTariff.value = mc.energyTariff;
+            if (mc.filamentWastePercent !== undefined) dom.filamentWastePercent.value = mc.filamentWastePercent;
+            if (mc.failureReservePercent !== undefined) dom.failureReservePercent.value = mc.failureReservePercent;
+          }
+
+          // Check for current full state
+          const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_STATE);
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          if (!s) return;
+
+          if (s.projectName !== undefined) dom.projectName.value = s.projectName;
+          if (s.filamentPrice !== undefined) dom.filamentPrice.value = s.filamentPrice;
+          if (s.filamentGrams !== undefined) dom.filamentGrams.value = s.filamentGrams;
+          if (s.printHours !== undefined) dom.printHours.value = s.printHours;
+          if (s.printMinutes !== undefined) dom.printMinutes.value = s.printMinutes;
+          if (s.energyTariff !== undefined) dom.energyTariff.value = s.energyTariff;
+          if (s.powerWatts !== undefined) dom.powerWatts.value = s.powerWatts;
+          if (s.packagingCost !== undefined) dom.packagingCost.value = s.packagingCost;
+          if (s.otherCosts !== undefined) dom.otherCosts.value = s.otherCosts;
+          if (s.printerCost !== undefined) dom.printerCost.value = s.printerCost;
+          if (s.printerLifespan !== undefined) dom.printerLifespan.value = s.printerLifespan;
+          if (s.maintenancePerHour !== undefined) dom.maintenancePerHour.value = s.maintenancePerHour;
+          if (s.laborCost !== undefined) dom.laborCost.value = s.laborCost;
+          if (s.filamentWastePercent !== undefined) dom.filamentWastePercent.value = s.filamentWastePercent;
+          if (s.failureReservePercent !== undefined) dom.failureReservePercent.value = s.failureReservePercent;
+          if (s.profitRateInput !== undefined) dom.profitRateInput.value = s.profitRateInput;
+          if (s.platformFeePercent !== undefined) dom.platformFeePercent.value = s.platformFeePercent;
+          if (s.fixedFee !== undefined) dom.fixedFee.value = s.fixedFee;
+          if (s.roundUp !== undefined) {
+            state.roundUp = !!s.roundUp;
+            dom.roundUpCheckbox.checked = state.roundUp;
+          }
+          if (s.method) {
+            setPricingMethod(s.method);
+          }
+        } catch (e) {
+          console.warn('Não foi possível carregar estado anterior do localStorage', e);
+        }
+      }
+
+      // --- EVENT LISTENERS INITIALIZATION ---
+
+      function bindEvents() {
+        // Automatic recalculation on any input change
+        const allInputs = document.querySelectorAll('input');
+        allInputs.forEach(input => {
+          input.addEventListener('input', () => {
+            calculateAll();
+          });
+        });
+
+        // Tab switches
+        dom.tabMarkup.addEventListener('click', () => setPricingMethod('markup'));
+        dom.tabMargin.addEventListener('click', () => setPricingMethod('margin'));
+
+        // Round up checkbox
+        dom.roundUpCheckbox.addEventListener('change', (e) => {
+          state.roundUp = e.target.checked;
+          calculateAll();
+        });
+
+        // Header buttons
+        dom.btnSaveCurrentProject.addEventListener('click', saveCurrentProject);
+        dom.btnOpenSaved.addEventListener('click', openSavedProjectsModal);
+        dom.btnClearProject.addEventListener('click', clearProjectInputs);
+        dom.btnCopyBudget.addEventListener('click', copyBudgetToClipboard);
+
+        // Modal close
+        dom.btnCloseModal.addEventListener('click', closeSavedProjectsModal);
+        dom.projectsModal.addEventListener('click', (e) => {
+          if (e.target === dom.projectsModal) {
+            closeSavedProjectsModal();
+          }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && dom.projectsModal.classList.contains('active')) {
+            closeSavedProjectsModal();
+          }
+        });
+      }
+
+      // --- STARTUP BOOTSTRAP ---
+      function init() {
+        bindEvents();
+        loadPersistedState();
+        updateProjectsBadge();
+        calculateAll();
+      }
+
+      // Run on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+
+    })();
+  </script>
+</body>
+</html>
